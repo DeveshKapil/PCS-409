@@ -1,0 +1,361 @@
+10.	Given an unsorted array of integers, design an algorithm and implement it using a program to sort an array of elements by dividing the array into two subarrays and combining these subarrays after sorting each one of them. Your program should also find number of comparisons and inversions during sorting the array.
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to merge two halves of the vector
+
+void merge(vector<int> &vtr, int left, int mid, int right, int &comp, int &inv) {
+    int n1 = mid - left + 1, n2 = right - mid, i, j, k;
+    int la[n1], ra[n2];
+
+    // Copy data to temporary arrays la[] and ra[]
+    for (i = 0, j = left; i < n1; i++, j++) {
+        la[i] = vtr[j];
+    }
+    for (i = 0; i < n1; i++, j++) {
+        ra[i] = vtr[j];
+    }
+
+    // Merge the two halves
+    i = 0;
+    j = 0;
+    while (i < n1 && j < n2) {
+        comp++;
+        if (la[i] <= ra[j]) {
+            vtr[left++] = la[i++];
+        } else {
+            inv++;
+            vtr[left++] = ra[j++];
+        }
+    }
+
+    // Copy the remaining elements of la[], if there are any
+    while (i < n1) {
+        vtr[left++] = la[i++];
+    }
+
+    // Copy the remaining elements of ra[], if there are any
+    while (j < n2) {
+        vtr[left++] = ra[j++];
+    }
+}
+
+// Function to perform merge sort
+
+void mergeSort(vector<int> &vtr, int left, int right, int &comp, int &inv) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+
+        // Recursively sort the two halves
+        mergeSort(vtr, left, mid, comp, inv);
+        mergeSort(vtr, mid + 1, right, comp, inv);
+
+        // Merge the sorted halves
+        merge(vtr, left, mid, right, comp, inv);
+    }
+}
+
+int main() {
+    vector<int> vtr; // Declare vector to store elements
+    int k, times, size, key, comp = 0, inv = 0;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++) {
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int l = 0; l < size; l++) {
+            inputfile >> key;
+            vtr.push_back(key); // Push the element into the vector
+        }
+
+        // Call the mergeSort function to sort and count inversions
+        mergeSort(vtr, 0, size - 1, comp, inv);
+
+        // Output the sorted array and the counts
+        for (int i = 0; i < vtr.size(); i++) {
+            outputfile << vtr[i] << " ";
+        }
+        outputfile << endl << "Comparisons: " << comp << endl;
+        outputfile << "Inversions: " << inv << endl;
+
+        // Reset counters and clear the vector for the next test case
+        comp = 0;
+        inv = 0;
+        vtr.clear();
+    }
+
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
+
+
+
+11.	Given an unsorted array of integers, design an algorithm and implement it using a program to sort an array of elements by partitioning the array into two subarrays based on a pivot element such that one of the sub arrays holds values smaller than the pivot element while another sub array holds values greater than the pivot element. Pivot element should be selected randomly from the array. Your program should also find number of comparisons and swaps required for sorting the array.
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Partition function for quicksort
+
+int partition(vector<int> &vtr, int low, int high, int &comp, int &swaps) {
+    // Choose the pivot
+    int pivot = vtr[high];
+    // Index of smaller element and indicate
+    // the right position of pivot found so far
+    int i = (low - 1);
+
+    for (int j = low; j < high; j++) {
+        comp++;
+        // If the current element is smaller than the pivot
+        if (vtr[j] < pivot) {
+            // Increment the index of the smaller element
+            i++;
+            swaps++;
+            swap(vtr[i], vtr[j]);
+        }
+    }
+    swaps++;
+    swap(vtr[i + 1], vtr[high]);
+    return (i + 1);
+}
+
+// Quicksort function
+
+void quickSort(vector<int> &vtr, int low, int high, int &comp, int &swaps) {
+    // When low is less than high
+    if (low < high) {
+        // pi is the partition return index of pivot
+        int pi = partition(vtr, low, high, comp, swaps);
+
+        // Recursion Call
+        // Smaller elements than the pivot go to the left
+        // and higher elements go to the right
+        quickSort(vtr, low, pi - 1, comp, swaps);
+        quickSort(vtr, pi + 1, high, comp, swaps);
+    }
+}
+
+int main() {
+    vector<int> vtr; // Declare vector to store elements
+    int k, times, size, key, comp = 0, swaps = 0;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++) {
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int l = 0; l < size; l++) {
+            inputfile >> key;
+            vtr.push_back(key); // Push the element into the vector
+        }
+
+        // Call the quickSort function to sort and count swaps
+        quickSort(vtr, 0, size - 1, comp, swaps);
+
+        // Output the sorted array and the counts
+        for (int i = 0; i < vtr.size(); i++) {
+            outputfile << vtr[i] << " ";
+        }
+        outputfile << endl << "Comparisons: " << comp << endl;
+        outputfile << "Swaps: " << swaps << endl;
+
+        // Reset counters and clear the vector for the next test case
+        comp = 0;
+        swaps = 0;
+        vtr.clear();
+    }
+
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
+
+
+12.	Given an unsorted array of integers, design an algorithm and implement it using a program to find Kth smallest or largest element in the array. (Worst case Time Complexity = O(n)).
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to heapify a subtree rooted with node i which is an index in vector vtr
+
+void heapify(vector<int> &vtr, int n, int i)
+{
+    int largest = i;
+    int left = 2 * i + 1, right = 2 * i + 2;
+
+    // Compare left child with the root
+    if (left < n && vtr[left] > vtr[largest])
+    {
+        largest = left;
+    }
+
+    // Compare right child with the largest so far
+    if (right < n && vtr[right] > vtr[largest])
+    {
+        largest = right;
+    }
+
+    // If the largest is not the root, swap and recursively heapify the affected subtree
+    if (largest != i)
+    {
+        swap(vtr[i], vtr[largest]);
+        heapify(vtr, n, largest);
+    }
+}
+
+// Function to perform heap sort on vector vtr, also updating key1 and key2
+
+void heapSort(vector<int> &vtr, int n, int &key1, int &key2)
+{
+    int kt1 = key1, kt2 = key2;
+
+    // Build a max heap
+    for (int i = n / 2 - 1; i >= 0; i--)
+    {
+        heapify(vtr, n, i);
+    }
+
+    // Extract elements one by one from the heap
+    for (int i = n; i >= 0; --i)
+    {
+        swap(vtr[0], vtr[i]);
+        kt1--;
+        kt2--;
+
+        if (kt1 == 0)
+        {
+            key1 = i;
+        }
+
+        if (kt2 == 0)
+        {
+            key2 = i;
+        }
+
+        if (kt1 <= 0 && kt2 <= 0)
+        {
+            return;
+        }
+
+        heapify(vtr, i, 0);
+    }
+}
+
+int main()
+{
+    vector<int> vtr; // Declare vector to store elements
+    int k, times, size, key, key1, key2;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open())
+    {
+        cerr << "Error opening input file\n";
+        return 1;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open())
+    {
+        cerr << "Error opening output file\n";
+        return 1;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++)
+    {
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int l = 0; l < size; l++)
+        {
+            inputfile >> key;
+            vtr.push_back(key); // Push the element into the vector
+        }
+
+        inputfile >> key;
+        // Call the heapSort function to sort the array using heap sort
+        if (key >= vtr.size())
+        {
+            outputfile << "Not present" << endl;
+        }
+        else
+        {
+            key1 = key;
+            key2 = vtr.size() - key + 1;
+            heapSort(vtr, vtr.size() - 1, key1, key2);
+
+            // Output the sorted array
+            for (int i = 0; i < vtr.size(); i++)
+            {
+                outputfile << vtr[i] << " ";
+            }
+
+            // Output the Kth largest and smallest elements
+            outputfile << endl
+                       << key << " largest element is : " << vtr[key1] << endl;
+            outputfile << key << " smallest element is : " << vtr[key2] << endl
+                       << endl;
+        }
+
+        // Reset counters and clear the vector for the next test case
+        vtr.clear();
+    }
+
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
