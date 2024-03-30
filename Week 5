@@ -1,0 +1,321 @@
+13.	Given an unsorted array of alphabets containing duplicate elements. Design an algorithm and implement it using a program to find which alphabet has maximum number of occurrences and print it. (Time Complexity = O(n)).
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to perform counting sort on a vector of characters
+// Parameters:
+// - str: input vector of characters to be sorted
+// - key: reference variable to store the frequency of the most frequent character
+// - ch: reference variable to store the most frequent character
+
+void countSort(vector<char> str, int& key, char& ch)
+{
+    // Array to store the frequency of each lowercase letter
+    int freq[26] = {0};
+    int i;
+
+    // Counting the frequency of each character in the vector
+    for (i = 0; i < str.size(); i++)
+    {
+        freq[str[i] - 'a']++;
+    }
+
+    // Finding the most frequent character and its frequency
+    for (i = 0; i < 26; i++)
+    {
+        if (freq[i] > key)
+        {
+            key = freq[i];
+            ch = i + 'a';
+        }
+    }
+}
+
+int main()
+{
+    vector<char> str; // Declare vector to store elements
+    int k, times, key, size;
+    char ch, in;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open())
+    {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open())
+    {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++)
+    {
+        // Read the size of the vector
+        inputfile >> size;
+
+        // Populate the vector with characters from the input
+        for(int i = 0; i < size;)
+        {
+            inputfile >> in;
+            if(in != ' ')
+            {
+                str.push_back(in);
+                i++;
+            }
+            else
+            {
+                i++;
+            }
+        }
+
+        key = 1;
+        ch = '0';
+
+        // Call countSort function to find the most frequent character
+        countSort(str, key, ch);
+
+        // Output the result based on the most frequent character
+        if (ch == '0')
+        {
+            outputfile << "No duplicates present" << endl << endl;
+        }
+        else
+        {
+            outputfile << ch << " : " << key << endl << endl;
+        }
+
+        // Clear the vector for the next iteration
+        str.clear();
+    }
+
+    // Close the files
+    inputfile.close();
+    outputfile.close();
+    return 0;
+}	
+ 
+ 
+14.	Given an unsorted array of integers, design an algorithm and implement it using a program to find whether two elements exist such that their sum is equal to the given key element. (Time Complexity = O(n log n)).
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <map>
+
+using namespace std;
+
+// Function to search for two numbers in a map that add up to a given key
+// Parameters:
+// - mp: map containing elements to be searched
+// - key: target sum to find two numbers that add up to
+// - n1: reference variable to store the first number (if found)
+// - n2: reference variable to store the second number (if found)
+void mapSearch(map<int, int> mp, int key, int &n1, int &n2)
+{
+    for (auto i = mp.begin(); i != mp.end(); i++)
+    {
+        int j = key - i->first;
+
+        // Check if the complement of the current element exists in the map
+        if (mp.find(j) != mp.end())
+        {
+            n1 = i->first;
+            n2 = j;
+            return;
+        }
+    }
+}
+
+int main()
+{
+    map<int, int> mp; // Declare map to store elements
+    int k, l, times, size, element, key, n1 = -1, n2 = -1;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open())
+    {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open())
+    {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++)
+    {
+        inputfile >> size;
+
+        // Populate the map with elements from the input
+        for (l = 0; l < size; l++)
+        {
+            inputfile >> element;
+            mp.insert({element, element});
+        }
+
+        inputfile >> key;
+
+        // Call mapSearch function to find two numbers that add up to the given key
+        mapSearch(mp, key, n1, n2);
+
+        // Output the result based on the found numbers
+        if (n1 == -1)
+        {
+            outputfile << "No such elements exist" << endl;
+        }
+        else
+        {
+            outputfile << n1 << "  " << n2 << endl;
+        }
+
+        // Reset variables and clear the map for the next iteration
+        n1 = n2 = -1;
+        mp.clear();
+    }
+    // Close the files
+    inputfile.close();
+    outputfile.close();
+    return 0;
+}
+
+ 
+15.	You have been given two sorted integer arrays of size m and n. Design an algorithm and implement it using a program to find list of elements which are common to both. (Time Complexity = O(m+n)).
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to search for duplicate elements between two sorted vectors
+// Parameters:
+// - vtr1: first sorted vector of integers
+// - vtr2: second sorted vector of integers
+// - outputfile: reference to the output file stream for writing results
+
+void search(vector<int> vtr1, vector<int> vtr2, ofstream &outputfile)
+{
+    int i = 0, j = 0, flag = 1;
+
+    // Iterate through both vectors to find duplicates
+    while (i < vtr1.size() && j < vtr2.size())
+    {
+        // Output the current elements being compared
+        cout << vtr1[i] << " " << vtr2[j] << endl;
+
+        // Check for duplicate elements
+        if (vtr1[i] == vtr2[j])
+        {
+            // If it's the first duplicate, output the header
+            if (flag == 1)
+            {
+                flag = 0;
+                outputfile << "Duplicate elements are :\n";
+            }
+
+            // Output the duplicate element
+            outputfile << vtr1[i] << " ";
+
+            // Move to the next elements in both vectors
+            i++;
+            j++;
+        }
+
+        // Move the pointer in the second vector if the current element is smaller
+        if (vtr1[i] > vtr2[j])
+        {
+            j++;
+        }
+        else
+        {
+            // Move the pointer in the first vector if the current element is smaller
+            i++;
+        }
+    }
+
+    // Output whether duplicates were found or not
+    if (flag)
+    {
+        outputfile << "No duplicates found" << endl << endl;
+    }
+    else
+    {
+        outputfile << endl << endl;
+    }
+}
+
+int main()
+{
+    vector<int> vtr1, vtr2; // Declare vectors to store elements
+    int k, times, key, size;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open())
+    {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open())
+    {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++)
+    {
+        // Read the size and elements of the first vector
+        inputfile >> size;
+        for (int l = 0; l < size; l++)
+        {
+            inputfile >> key;
+            vtr1.push_back(key);
+        }
+
+        // Read the size and elements of the second vector
+        inputfile >> size;
+        for (int l = 0; l < size; l++)
+        {
+            inputfile >> key;
+            vtr2.push_back(key);
+        }
+
+        // Call the search function to find duplicate elements
+        search(vtr1, vtr2, outputfile);
+
+        // Clear the vectors for the next iteration
+        vtr1.clear();
+        vtr2.clear();
+    }
+
+    // Close the files
+    inputfile.close();
+    outputfile.close();
+    return 0;
+}
