@@ -1,0 +1,334 @@
+4.	Given a sorted array of positive integers containing few duplicate elements, design an algorithm and implement it using a program to find whether the given key element is present in the array or not. If present, then also find the number of copies of given key. (Time Complexity = O(log n))
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to perform binary search on a vector
+// Returns the count of occurrences of the element, -1 if not found
+
+int binarySearch(vector<int> vtr, int element) {
+    
+// Initialize variables
+    int left = 0, right = vtr.size() - 1 - 1, mid; // Pointers for binary search
+
+    // Binary search loop
+    while (left <= right) {
+        mid = left + (right - left) / 2; // Calculate the mid index
+
+        if (vtr[mid] == element) { // If element found
+
+            int lf = 0, rr = mid, mm;
+            int arr[2] = {0};
+
+            // Left half binary search to find the first occurrence
+            while (lf <= rr) {
+                mm = lf + (rr - lf) / 2;
+
+                if (vtr[mm] == element) {
+                    if ((mm != 0 && vtr[mm] != vtr[mm - 1]) || 
+		 mm == 0 && 	vtr[mm] == element) {
+                        arr[0] = mm;
+                        break;
+                    } else {
+                        rr = mm - 1;
+                    }
+                } else if (vtr[mm] < element) {
+                    lf = mm + 1;
+                }
+            }
+
+
+            // Right half binary search to find the last occurrence
+            lf = mid ;
+            rr = vtr.size() - 1;
+            while (lf <= rr) {
+                mm = lf + (rr - lf) / 2;
+
+                if (vtr[mm] == element) {
+                    if ((mm != vtr.size() - 1 && vtr[mm] != vtr[mm + 1]) || 
+		 mm == vtr.size() - 1 && vtr[mm] == element) {
+                        arr[1] = mm;
+                        break;
+                    } else {
+                        lf = mid + 1;
+                    }
+                } else if (vtr[mm] > element) {
+                    rr = mm - 1;
+                }
+            }
+            return arr[1] - arr[0] + 1; // Return the count of occurrences
+        } else {
+            if (vtr[mid] > element) { // If element is in the left half
+                right = mid - 1; // Adjust the right pointer
+            } else { // If element is in the right half
+                left = mid + 1; // Adjust the left pointer
+            }
+        }
+    }
+    return -1; // Element not found
+}
+
+int main() {
+    vector<int> vtr; // Declare vector to store elements
+    int i, times, key, size, element;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (i = 1; i <= times; i++) {
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int j = 0; j < size; j++) {
+            inputfile >> key;
+            vtr.push_back(key); // Push the element into the vector
+        }
+
+        inputfile >> element;
+        key = binarySearch(vtr, element); // Perform binary search on the vector
+
+        // Output the result
+        if (key == -1) {
+            outputfile << "Key not Present" << endl;
+        } else {
+            outputfile << element << " - " << key << endl;
+        }
+
+        vtr.clear(); // Clear the vector for the next test case
+    }
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
+
+
+
+5.	Given a sorted array of positive integers, design an algorithm and implement it using a program to find three indices i, j, k such that arr[i] + arr[j] = arr[k].
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to perform binary search on a vector
+// Returns the index of the element if found, -1 otherwise
+
+int binarySearch(vector<int> vtr, int left, int element) {
+
+    // Initialize variables
+    int right = vtr.size() - 1, mid; // Pointers for binary search
+
+    // Binary search loop
+    while (left <= right) {
+        mid = left + (right - left) / 2; // Calculate the mid index
+
+        if (vtr[mid] == element) { // If element found
+            return mid;
+        } else {
+            if (vtr[mid] > element) { // If element is in the left half
+                right = mid - 1; // Adjust the right pointer
+            } else { // If element is in the right half
+                left = mid + 1; // Adjust the left pointer
+            }
+        }
+    }
+    return -1; // Element not found
+}
+
+// Function to find the triplet with the required sum and output the result
+void find(vector<int> vtr, ofstream &outputfile) {
+    int i, j, key, flag, element;
+
+    // Loop to find the triplet with the required sum
+    for (i = 0; i < vtr.size(); i++) {
+        flag = 0;
+        for (j = i + 1; j < vtr.size(); j++) {
+            element = vtr[j] + vtr[i];
+            key = binarySearch(vtr, j, element); // Perform binary search on the vector
+            if (key > -1) {
+                flag = 1;
+                break;
+            }
+        }
+        if (flag) {
+            break;
+        }
+    }
+
+    // Output the result
+    if (flag) {
+        outputfile << i + 1 << " " << j + 1 << " " << key + 1 << endl << endl;
+    } else {
+        outputfile << "No sequence found" << endl << endl;
+    }
+}
+
+int main() {
+    vector<int> vtr; // Declare vector to store elements
+    int k, times, size, key;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++) {
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int l = 0; l < size; l++) {
+            inputfile >> key;
+            vtr.push_back(key); // Push the element into the vector
+        }
+        
+        find(vtr, outputfile); // Call the function to find and output the result
+
+        vtr.clear(); // Clear the vector for the next test case
+    }
+
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
+
+
+
+6.	Given an array of nonnegative integers, design an algorithm and a program to count the number of pairs of integers such that their difference is equal to a given key, K.
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to perform linear search on a vector
+// Returns the index of the element if found, -1 otherwise
+
+int linearSearch(vector<int> vtr, int i, int element) {
+    while (i < vtr.size()) {
+        if (vtr[i] == element) { 
+            return i;
+        }
+        i++;
+    }
+    return -1; // Element not found
+}
+
+// Function to find pairs in the vector with a specified key and output the result
+
+void find(vector<int> vtr, ofstream &outputfile, int key) {
+    int j, flag = 0, element, count = 0, res;
+
+    // Loop to find pairs with the specified key
+    for (j = 0; j < vtr.size(); j++) {
+        if (key > vtr[j]) {
+            // Check for key + vtr[j]
+            element = key + vtr[j];
+            res = linearSearch(vtr, j + 1, element);
+            if (res > -1) {
+                count++;
+                flag = 1;
+            }
+        } else {
+            // Check for vtr[j] - key
+            element = vtr[j] - key;
+            res = linearSearch(vtr, j + 1, element);
+            if (res > -1) {
+                count++;
+                flag = 1;
+            }
+
+            // Check for vtr[j] + key
+            element = vtr[j] + key;
+            res = linearSearch(vtr, j + 1, element);
+            if (res > -1) {
+                count++;
+                flag = 1;
+            }
+        }
+    }
+
+    // Output the result
+    if (flag) {
+        outputfile << count << endl << endl;
+    } else {
+        outputfile << "No pair found" << endl << endl;
+    }
+}
+
+int main() {
+    vector<int> vtr; // Declare vector to store elements
+    int k, times, size, key;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++) {
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int l = 0; l < size; l++) {
+            inputfile >> key;
+            vtr.push_back(key); // Push the element into the vector
+        }
+        inputfile >> key;
+
+        find(vtr, outputfile, key); // Call the function to find and output the result
+
+        vtr.clear(); // Clear the vector for the next test case
+    }
+
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
