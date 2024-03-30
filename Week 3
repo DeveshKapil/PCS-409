@@ -1,0 +1,229 @@
+7.	Given an unsorted array of integers, design an algorithm and a program to sort the array using insertion sort. Your program should be able to find number of comparisons and shifts ( shifts- total number of times the array elements are shifted from their place) required for sorting the array.
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to perform insertion sort on the vector and output the result
+
+void insertionSort(vector<int> vtr, ofstream &outputfile) {
+    int i, j, count_comp = 0, count_swap = 0, temp;
+
+    // Loop to find pairs with the specified key
+    for (j = 1; j < vtr.size(); j++) {
+        count_comp++;
+        if(vtr[j] < vtr[j - 1]) {
+            temp = vtr[j];
+            i = j - 1;
+            while (i >= 0 && vtr[i] > temp) {
+                count_comp++;
+                count_swap++;
+                vtr[i + 1] = vtr[i];
+                i--;
+            }
+            vtr[i + 1] = temp;
+        }
+    }
+
+    // Output the sorted vector, comparisons, and shifts
+    for(i = 0; i < vtr.size(); i++) {
+        outputfile << vtr[i] << " ";
+    }
+
+    outputfile << endl << "Comparisons = " << count_comp << endl;
+    outputfile << "Shifts = " << count_swap << endl;
+}
+
+int main() {
+    vector<int> vtr; // Declare vector to store elements
+    int k, times, size, key;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++) {
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int l = 0; l < size; l++) {
+            inputfile >> key;
+            vtr.push_back(key); // Push the element into the vector
+        }
+
+        insertionSort(vtr, outputfile); // Call the function to find and output the result
+
+        vtr.clear(); // Clear the vector for the next test case
+    }
+
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
+
+
+
+8.	Given an unsorted array of integers, design an algorithm and implement a program to sort this array using selection sort. Your program should also find number of comparisons and number of swaps required.
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+// Function to perform selection sort on the vector and output the result
+
+void selectionSort(vector<int> vtr, ofstream &outputfile) {
+    int i, j, count_comp = 0, count_swap = 0, temp, min;
+
+    // Loop to find minimum element in the unsorted part of the vector
+    for (i = 0; i < vtr.size(); i++) {
+        min = i;
+        
+        // Find the index of the minimum element in the unsorted part
+        for (j = i + 1; j < vtr.size(); j++) {
+            count_comp++;
+            if (vtr[j] < vtr[min]) {
+                min = j;
+            }
+        }
+
+        // Swap the found minimum element with the first element of the unsorted part
+        if (min != i) {
+            temp = vtr[i];
+            vtr[i] = vtr[min];
+            vtr[min] = temp;
+            count_swap++;
+        }
+    }
+
+    // Output the sorted vector, comparisons, and swaps
+    for (i = 0; i < vtr.size(); i++) {
+        outputfile << vtr[i] << " ";
+    }
+
+    outputfile << endl << "Comparisons = " << count_comp << endl;
+    outputfile << "Swaps = " << count_swap << endl;
+}
+
+int main() {
+    vector<int> vtr; // Declare vector to store elements
+    int k, times, size, key;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++) {
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int l = 0; l < size; l++) {
+            inputfile >> key;
+            vtr.push_back(key); // Push the element into the vector
+        }
+
+        selectionSort(vtr, outputfile); // Call the function to find and output the result
+
+        vtr.clear(); // Clear the vector for the next test case
+    }
+
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
+
+
+
+9.	Given an unsorted array of positive integers, design an algorithm and implement it using a program to find whether there are any duplicate elements in the array or not. (use sorting) (Time Complexity = O(n log n)).
+
+#include <iostream>
+#include <fstream>
+#include <map>
+
+using namespace std;
+
+int main() {
+    map<int, int> vtr; // Declare map to store elements (key, key)
+    int k, times, size, key, flag;
+
+    // Loading input file
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Error opening input file\n";
+        return 0;
+    }
+
+    // Loading output file
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Error opening output file\n";
+        return 0;
+    }
+
+    inputfile >> times; // Read the number of test cases
+
+    // Loop for each test case
+    for (k = 1; k <= times; k++) {
+        flag = 1; // Initialize flag to 1 (indicating NO)
+
+        inputfile >> size; // Read the size of the array
+
+        // Input array elements
+        for (int l = 0; l < size; l++) {
+            inputfile >> key;
+            auto temp = vtr.insert({key, key}); // Insert the element into the map
+
+            // Check if insertion was successful, i.e., if the key already existed in the map
+            if (!temp.second) {
+                outputfile << "YES" << endl;
+                flag = 0; // Set flag to 0 (indicating YES) and break out of the loop
+                break;
+            }
+        }
+
+        // Check flag to determine if any repeated elements were found
+        if (flag) {
+            outputfile << "NO" << endl;
+        }
+
+        vtr.clear(); // Clear the map for the next test case
+    }
+
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
