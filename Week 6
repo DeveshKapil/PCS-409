@@ -100,3 +100,107 @@ int main()
         vtr.clear();
     }
 }
+#include <iostream>
+#include <vector>
+#include <fstream>
+using namespace std;
+
+// Function to perform Depth First Search (DFS)
+// Returns 1 if path exists between 'st' and 'end', 0 otherwise
+int dfs(vector<vector<int>> vtr, int size, vector<bool> visit, int st, int end) {
+    visit[st] = true;
+    if (st == end) {
+        return 1; // Found the end node
+    }
+    for (int i = 0; i < size; i++) {
+        if (vtr[st][i] != 0 && !visit[i]) {
+            if (dfs(vtr, size, visit, i, end) == 1)
+                return 1; // If end node found in recursive call, return 1
+        }
+    }
+    return 0; // No path found between 'st' and 'end'
+}
+
+// Function to search for a path between 'st' and 'end'
+// Returns "Yes Path Exists" if a path exists, "No Such Path Exists" otherwise
+string path_search(vector<vector<int>> vtr, int size, int st, int end) {
+    vector<bool> visited(size, false);
+    int flag = dfs(vtr, size, visited, st, end);
+    if (flag == 1) {
+        return "Yes Path Exists\n";
+    } else {
+        return "No Such Path Exists\n";
+    }
+}
+
+int main() {
+    int m, n, size, time, element;
+    vector<vector<int>> vtr;
+    vector<int> vtt, temp;
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Unable to open input file\n";
+        return 1;
+    }
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Unable to open output file\n";
+        return 1;
+    }
+
+    // Read the number of test cases from input file
+    inputfile >> time;
+
+    // Loop through each test case
+    for (int l = 1; l <= time; l++) {
+        // Read the size of the graph
+        inputfile >> size;
+
+        // Read the vertices
+        for (int k = 0; k < size; k++) {
+            inputfile >> element;
+            vtt.push_back(element);
+        }
+
+        // Read the adjacency matrix
+        for (int k = 0; k < size; k++) {
+            for (int j = 0; j < size; j++) {
+                inputfile >> element;
+                temp.push_back(element);
+            }
+            vtr.push_back(temp);
+            temp.clear();
+        }
+
+        // Read the start and end points
+        int p1, p2, i1 = -1, i2 = -1;
+        inputfile >> p1 >> p2;
+
+        // Find indices of start and end points in the vertices list
+        for (int j = 0; j < size; j++) {
+            if (vtt[j] == p1) {
+                i1 = j;
+            }
+            if (vtt[j] == p2) {
+                i2 = j;
+            }
+            if (i1 != -1 && i2 != -1) {
+                // Search for path between start and end points
+                string str = path_search(vtr, size, i1, i2);
+                // Write result to output file
+                outputfile << str << endl;
+                break;
+            }
+        }
+
+        // Clear vectors for next test case
+        vtt.clear();
+        vtr.clear();
+    }
+
+    // Close input and output files
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
