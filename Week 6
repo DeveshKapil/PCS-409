@@ -105,3 +105,192 @@ int main() {
 
     return 0;
 }
+
+
+
+Q17. Given a graph, design an algorithm and implement it using a program to find if a graph is bipartite or not.
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <queue>
+using namespace std;
+
+// Function to check if a graph is bipartite
+string bipartite(vector<vector<int>> vtr, int size) {
+    // Initialize visited array
+    vector<int> visited(size, -1);
+
+    // Start BFS traversal from source vertex 0
+    int src = 0;
+    queue<int> q;
+    q.push(src);
+    visited[src] = 0;
+
+    while (!q.empty()) {
+        src = q.front();
+
+        // Check for self-loop, if present, graph is not bipartite
+        if (vtr[src][src] == 1) {
+            return "Not Bipartite\n";
+        }
+
+        // Traverse adjacent vertices
+        for (int i = 0; i < size; i++) {
+            if (vtr[src][i] == 1 && visited[i] == -1) {
+                // If neighbor not visited, push it to queue and mark it as visited
+                q.push(i);
+                visited[i] = 0;
+            } else if (vtr[src][i] && visited[i] == 0) {
+                // If neighbor visited and has same color, graph is not bipartite
+                return "Not Bipartite\n";
+            }
+        }
+        q.pop();
+        visited[src] = 1;
+    }
+
+    return "Yes Bipartite\n";
+}
+
+int main() {
+    int m, n, size, time, element;
+    vector<vector<int>> vtr;
+    vector<int> vtt, temp;
+    ifstream inputfile("input.txt");
+    if (!inputfile.is_open()) {
+        cerr << "Unable to open input file\n";
+        return 1;
+    }
+    ofstream outputfile("output.txt");
+    if (!outputfile.is_open()) {
+        cerr << "Unable to open output file\n";
+        return 1;
+    }
+
+    // Read the number of test cases from input file
+    inputfile >> time;
+
+    // Loop through each test case
+    for (int l = 1; l <= time; l++) {
+        // Read the size of the graph
+        inputfile >> size;
+
+        // Read the adjacency matrix
+        for (int k = 0; k < size; k++) {
+            for (int j = 0; j < size; j++) {
+                inputfile >> element;
+                temp.push_back(element);
+            }
+            vtr.push_back(temp);
+            temp.clear();
+        }
+
+        // Check if the graph is bipartite
+        string str = bipartite(vtr, size);
+        // Write result to output file
+        outputfile << str << endl;
+
+        // Clear vectors for next test case
+        vtr.clear();
+    }
+
+    // Close input and output files
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
+
+
+
+
+Q18. Given a directed graph, design an algorithm and implement it using a program to find whether cycle exists in the graph or not.
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+using namespace std;
+
+// Function to perform Depth First Search (DFS)
+// Returns 1 if a cycle exists starting from 'src', 0 otherwise
+int dfs(vector<vector<int>> vtr, int size, vector<bool> &visit, int src) {
+    // If the current node is already visited or has a self-loop, a cycle exists
+    if (visit[src] == true || vtr[src][src] == 1) {
+        return 1;
+    }
+    visit[src] = true; // Mark the current node as visited
+    
+    // Explore neighbors of the current node
+    for (int i = 0; i < size; i++) {
+        if (vtr[src][i] != 0) { // If there is an edge from 'src' to 'i'
+            if (dfs(vtr, size, visit, i) == 1) { // Recursive call for neighbor 'i'
+                return 1; // If a cycle is found in the subtree, return 1
+            }
+        }
+    }
+    return 0; // No cycle found starting from 'src'
+}
+
+// Function to search for a cycle in the graph
+// Returns "Yes Cycle Exists" if a cycle exists, "No Cycle Exists" otherwise
+string path_search(vector<vector<int>> vtr, int size, int src) {
+    vector<bool> visited(size, false); // Initialize visited array
+    int flag = dfs(vtr, size, visited, src); // Check for a cycle starting from 'src'
+    if (flag) {
+        return "Yes Cycle Exists\n"; // If a cycle exists, return "Yes Cycle Exists"
+    } else {
+        return "No Cycle Exists\n"; // If no cycle exists, return "No Cycle Exists"
+    }
+}
+
+int main() {
+    int m, n, size, time, element;
+    vector<vector<int>> vtr; // Adjacency matrix representation of the graph
+    vector<int> vtt, temp; // Temporary vectors for reading input
+    ifstream inputfile("input.txt"); // Open input file
+    if (!inputfile.is_open()) {
+        cerr << "Unable to open input file\n";
+        return 1;
+    }
+    ofstream outputfile("output.txt"); // Open output file
+    if (!outputfile.is_open()) {
+        cerr << "Unable to open output file\n";
+        return 1;
+    }
+
+    // Read the number of test cases from input file
+    inputfile >> time;
+
+    // Loop through each test case
+    for (int l = 1; l <= time; l++) {
+        // Read the size of the graph
+        inputfile >> size;
+
+        // Read the adjacency matrix
+        for (int k = 0; k < size; k++) {
+            for (int j = 0; j < size; j++) {
+                inputfile >> element;
+                temp.push_back(element);
+            }
+            vtr.push_back(temp);
+            temp.clear();
+        }
+        
+        // Check for a cycle starting from node 0
+        string str = path_search(vtr, size, 0);
+        
+        // Write result to output file
+        outputfile << str << endl;
+        
+        // Clear vectors for next test case
+        vtt.clear();
+        vtr.clear();
+    }
+
+    // Close input and output files
+    inputfile.close();
+    outputfile.close();
+
+    return 0;
+}
